@@ -1,9 +1,10 @@
 USE roomdb;
 
 -- Back to the starting state: 3 rooms, 5 reservations, 3 accounts. Run inside roomdb (USE roomdb;).
-DROP TABLE IF EXISTS app_user;
 DROP TABLE IF EXISTS reservation;
 DROP TABLE IF EXISTS room;
+DROP TABLE IF EXISTS refresh_token;
+DROP TABLE IF EXISTS app_user;
 
 CREATE TABLE room (
                       id        BIGINT       AUTO_INCREMENT PRIMARY KEY,
@@ -28,6 +29,16 @@ CREATE TABLE app_user (
                           password_hash  VARCHAR(100) NOT NULL,
                           role           VARCHAR(20)  NOT NULL,
                           CONSTRAINT uq_app_user_username UNIQUE (username)
+);
+
+CREATE TABLE refresh_token (
+                               id         BIGINT      NOT NULL AUTO_INCREMENT,
+                               token      VARCHAR(64) NOT NULL,
+                               user_id    BIGINT      NOT NULL,
+                               expires_at DATETIME    NOT NULL,
+                               PRIMARY KEY (id),
+                               CONSTRAINT uq_refresh_token UNIQUE (token),
+                               CONSTRAINT fk_refresh_token_user FOREIGN KEY (user_id) REFERENCES app_user (id)
 );
 
 INSERT INTO room (name, capacity) VALUES ('Seminar A', 8);
