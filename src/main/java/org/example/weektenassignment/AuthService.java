@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,6 +67,17 @@ public class AuthService {
             throw new BadCredentialsException("wrong username or password");
         }
         return issueTokens(user);
+    }
+
+    @Transactional
+    public TokenResponse refresh(String refreshToken) {
+        RefreshToken stored = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(() -> new InvalidBearerTokenException("refresh token is invalid or expired"));
+        if (stored.isExpired()) {
+            throw new InvalidBearerTokenException("refresh token is invalid or expired");
+        }
+        refreshTokenRepository.delete(stored);
+        return issueTokens(stored.getUser());
     }
 
     private TokenResponse issueTokens(AppUser user) {
