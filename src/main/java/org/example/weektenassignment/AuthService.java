@@ -79,6 +79,10 @@ public class AuthService {
         refreshTokenRepository.delete(stored);
         return issueTokens(stored.getUser());
     }
+    @Transactional
+    public void logout(String refreshToken) {
+        refreshTokenRepository.deleteByToken(refreshToken);
+    }
 
     private TokenResponse issueTokens(AppUser user) {
         String refreshToken = newRefreshToken();
