@@ -147,6 +147,18 @@ export JWT_SECRET="put-a-long-random-secret-of-at-least-32-bytes-here"
 ./gradlew bootRun
 ```
 
+### Refresh tokens (optional challenge)
+
+Login also returns a `refreshToken`: a random value stored in the `refresh_token` table, valid for 7 days.
+
+| Method | Path | Body | Answer |
+|---|---|---|---|
+| POST | `/api/auth/refresh` | `{ "refreshToken": "..." }` | 200, a new access token **and** a new refresh token. The old refresh token is deleted, so each one works only once. |
+| POST | `/api/auth/logout` | `{ "refreshToken": "..." }` | 204, the refresh token is deleted from the table |
+
+An unknown, used, expired or logged-out refresh token answers 401 `token is invalid or expired`.
+An access token stays valid until its 30 minutes are up, even after logout: only the refresh token can be taken back.
+Requests 57–62 in `api.http` show the whole cycle.
 ## API Endpoints
 
 | Method | Endpoint | Login | Status | Description |
@@ -257,12 +269,6 @@ Every write in 1–41, and the reservation reads 22, 24, 25, 38 and 39, carry Mi
 | 55 | Get rooms with a broken token | 401, `token is invalid or expired` |
 | 56 | Mina's reservations without logging in | 401, `login required` |
 
-### Requests 57–58: My extra error tests
-
-| # | Test | Expected |
-|---:|---|---:|
-| 57 | Reservation with a non-numeric ID | 400 |
-| 58 | Room name longer than 100 characters | 400 |
 
 ## Validation
 

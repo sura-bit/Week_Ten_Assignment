@@ -303,18 +303,46 @@ Authorization: Bearer abc.def.ghi
 ### 56. Someone's reservations without logging in (expect 401, "login required")
 GET http://localhost:8080/api/reservations?reservedBy=Mina
 
-### ---------- My extra error tests (from Assignment 6) ----------
+### ---------- Optional challenge: refresh token ----------
 
-### 57. Reservation id is not a number (expect 400, "'id' has the wrong type")
-GET http://localhost:8080/api/reservations/not-a-number
-Authorization: Basic bWluYTptaW5hMTIzNA==
-
-### 58. Room name longer than 100 characters (expect 400, fieldErrors: name)
-POST http://localhost:8080/api/rooms
+### 57. Log in as mina (expect 200, accessToken and refreshToken)
+POST http://localhost:8080/api/auth/login
 Content-Type: application/json
-Authorization: Basic bWluYTptaW5hMTIzNA==
 
-{
-  "name": "This room name is intentionally longer than one hundred characters so that the name size validation rule rejects the request before it reaches the service layer",
-  "capacity": 5
-}
+{ "username": "mina", "password": "mina1234" }
+
+> {% client.global.set("refresh", response.body.refreshToken); %}
+
+### 58. Exchange the refresh token (expect 200, a new accessToken and a new refreshToken)
+POST http://localhost:8080/api/auth/refresh
+Content-Type: application/json
+
+{ "refreshToken": "{{refresh}}" }
+
+> {%
+    client.global.set("oldRefresh", client.global.get("refresh"));
+    client.global.set("refresh", response.body.refreshToken);
+    client.global.set("minaToken", response.body.accessToken);
+%}
+
+### 59. The new access token works (expect 200, username mina)
+GET http://localhost:8080/api/auth/me
+Authorization: Bearer {{minaToken}}
+
+### 60. The old refresh token was already used (expect 401, "token is invalid or expired")
+POST http://localhost:8080/api/auth/refresh
+Content-Type: application/json
+
+{ "refreshToken": "{{oldRefresh}}" }
+
+### 61. Log out (expect 204; the row disappears from refresh_token)
+POST http://localhost:8080/api/auth/logout
+Content-Type: application/json
+
+{ "refreshToken": "{{refresh}}" }
+
+### 62. Refresh after logout (expect 401, "token is invalid or expired")
+POST http://localhost:8080/api/auth/refresh
+Content-Type: application/json
+
+{ "refreshToken": "{{refresh}}" }
