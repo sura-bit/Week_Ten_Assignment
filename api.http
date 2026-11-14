@@ -118,8 +118,6 @@ Authorization: Basic bWluYTptaW5hMTIzNA==
 GET http://localhost:8080/api/reservations/99
 Authorization: Basic bWluYTptaW5hMTIzNA==
 
-### ---------- Week 9 in class: dirty checking and error bodies (rooms) ----------
-
 ### 26. Same values again (expect 200; console: one select, no update)
 PUT http://localhost:8080/api/rooms/2
 Content-Type: application/json
@@ -164,8 +162,6 @@ Authorization: Basic bWluYTptaW5hMTIzNA==
 
 ### 33. A URL that does not exist (expect 404, not 500)
 GET http://localhost:8080/api/nothing
-
-### ---------- Week 9 Lab E: reservations and bad input ----------
 
 ### 34. Blank reservedBy (expect 400, fieldErrors: reservedBy)
 POST http://localhost:8080/api/rooms/1/reservations
@@ -213,8 +209,6 @@ Authorization: Basic bWluYTptaW5hMTIzNA==
 ### 41. Not an id (expect 400, "'id' has the wrong type")
 GET http://localhost:8080/api/rooms/abc
 
-### ---------- Week 10, hour 2: Spring Security and HTTP Basic ----------
-
 ### 42. Create a room without logging in (expect 401, message "login required")
 POST http://localhost:8080/api/rooms
 Content-Type: application/json
@@ -260,8 +254,6 @@ GET http://localhost:8080/api/rooms
 GET http://localhost:8080/api/auth/me
 Authorization: Basic bGVlOmxlZTEyMzQ1
 
-### ---------- Week 10, hour 3: a token instead of the password ----------
-
 ### 50. Log in (expect 200, accessToken, tokenType "Bearer", expiresIn 1800). The script keeps the token.
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
@@ -298,12 +290,8 @@ Authorization: Bearer abc.def.ghi
 GET http://localhost:8080/api/rooms
 Authorization: Bearer abc.def.ghi
 
-### ---------- Week 10 Lab F ----------
-
 ### 56. Someone's reservations without logging in (expect 401, "login required")
 GET http://localhost:8080/api/reservations?reservedBy=Mina
-
-### ---------- Optional challenge: refresh token ----------
 
 ### 57. Log in as mina (expect 200, accessToken and refreshToken)
 POST http://localhost:8080/api/auth/login
