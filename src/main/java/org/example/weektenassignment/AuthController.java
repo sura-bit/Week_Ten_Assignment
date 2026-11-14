@@ -30,4 +30,9 @@ public class AuthController {
                         .map(GrantedAuthority::getAuthority)
                         .toList());
     }
+    @PostMapping("/login")
+    public TokenResponse login(@Valid @RequestBody LoginRequest request) {
+        return authService.login(request.username(), request.password());
+    }
 }
+
